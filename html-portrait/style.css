@@ -1,27 +1,42 @@
 body {
-  background-image: url("assets/sky.gif");
+  background-image: url("assets/bg.gif");
   background-size: cover;
   height: 100vh;
 }
 
-img {
+.imageRow img {
   height: 150px;
   border-radius: 20px;
   padding: 10px;
-  transition: 1s;
-  filter: grayscale(100%);
-  /*      border: 3px solid blue; */
+  transition: 0.4s;
+  filter: hue-rotate(200deg);
 }
 
-img:hover {
-  height: 400px;
-  filter: grayscale(0%);
-  /*   border: 1px solid red; */
+.imageRow img:hover {
+  transform: scale(1.25);
+  filter: none;
 }
 
-p:hover {
-  /*   transform: rotate(5deg); */
-  letter-spacing: 1em;
+.imageRow {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  gap: 70px;              
+  width: 100%;           
+}
+
+p {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;   
+  color: white;
+  text-align: left;  
+  padding-left: 20px;
+}
+
+#blue {
+  color: white;
+  font-style: italic;
+   text-align: center;
 }
 
 .specialCenter {
@@ -30,23 +45,23 @@ p:hover {
   align-items: center;
 }
 
-h1,
-a {
-  animation: coolAnimation 3s infinite;
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;   
+  color: white;
 }
 
-#p1 {
-  animation: coolAnimation 5s infinite;
+h1 {
+  font-family: "Didot", "Times New Roman", serif;
+  font-style: italic;
+  text-align: center;
+  color: white;
 }
 
-@keyframes coolAnimation {
-  0% {
-    color: red;
-  }
-  50% {
-    color: green;
-  }
-  100% {
-    color: blue;
-  }
+h2 {
+  font-family: "Didot", "Times New Roman", serif;
+  font-style: italic;
+  text-align: left;  
+  padding-left: 20px;
+  color: white;
 }
