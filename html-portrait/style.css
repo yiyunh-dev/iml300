@@ -6,10 +6,10 @@ body {
 
 .imageRow img {
   height: 150px;
-  border-radius: 20px;
+  border-radius: 5px;
   padding: 10px;
-  transition: 0.4s;
-  filter: hue-rotate(200deg);
+  transition: 0.5s;
+  filter: hue-rotate(300deg);
 }
 
 .imageRow img:hover {
@@ -56,12 +56,18 @@ h1 {
   font-style: italic;
   text-align: center;
   color: white;
+  text-shadow: 6px 3px #ffb0eb
 }
 
 h2 {
+    border: 1px dotted #9595f4;
+    width: 350px;
+    height: 30px;
+    background-color: rgba(164, 132, 177, 0.49);
   font-family: "Didot", "Times New Roman", serif;
   font-style: italic;
   text-align: left;  
   padding-left: 20px;
-  color: white;
+  color: #FFFFFF;
+
 }

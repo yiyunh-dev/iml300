@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+
+/* type */
+
+body {
+  font-family: "Arial", sans-serif;
+}
+
+/* positioning */
+
+section {
+  width: 600px;
+  margin-left: 400px;
+}
+
+/* relative position */
+
+.indent {
+  position: relative;
+  left: 20px;
+}
+
+/* absolute position */
+
+#intro {
+  /* position: absolute; */
+  width: 320px;
+  left: 40px;
+  position: fixed;
+}
+
+/* fixed position */
+
+#smiley {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 6rem;
+}
+
+#smiley a {
+  text-decoration: none;
+}
+
+/* sticky position */
+
+.section-title {
+  position: sticky;
+  top: 0px;
+  background-color: blue;
+  color: rgb(255, 255, 255);
+}

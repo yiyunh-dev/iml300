@@ -1,0 +1,30 @@
+body {
+  text-align: center;
+  display: grid;
+  height: 100vh;
+  font-size: 50px;
+}
+
+.center {
+  margin: auto;
+}
+
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+summary {
+  outline: none;
+}
+
+summary {
+  border: 5px solid red;
+}
+
+details {
+  border: 5px solid green;
+}

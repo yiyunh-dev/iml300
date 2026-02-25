@@ -1,0 +1,58 @@
+* {
+  box-sizing: border-box;
+}
+
+/* type */
+
+body {
+  /* font-family: arial, sans-serif; */
+  font-family: "Yanone Kaffeesatz", sans-serif;
+  font-weight: 400;
+/*  text-align: right;*/
+}
+
+h1 {
+  font-family: "Righteous", cursive;
+}
+
+/* position */
+
+section {
+  width: 600px;
+  margin-left: 400px;
+}
+
+/* relative position */
+
+.indent {
+  position: relative;
+  left: 20px;
+}
+
+/* absolute position */
+
+#intro {
+  position: absolute;
+  width: 320px;
+  left: 40px;
+}
+
+/* fixed position */
+
+#smiley {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 2rem;
+}
+
+#smiley a {
+  text-decoration: none;
+}
+
+/* sticky position */
+
+.section-title {
+  position: sticky;
+  top: 0px;
+}

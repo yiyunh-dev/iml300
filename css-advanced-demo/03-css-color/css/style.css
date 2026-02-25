@@ -1,0 +1,14 @@
+body {
+  font-family: "Arial", sans-serif;
+
+  /* The color picker will show up when you hover over 
+  a hex or RGB color code,  */
+
+  /* background-color:rgb(125, 128, 6); */
+  /*    background-color:#14cc76;*/
+  background: linear-gradient(yellow, red);
+}
+
+h1 {
+  color: rgba(163, 46, 46, 0.509);
+}
