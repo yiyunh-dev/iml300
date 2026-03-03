@@ -1,0 +1,139 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+.center {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.fire {
+  background: url(asset/fire.gif)no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+    animation: zoomFire 5s ease-in-out infinite;
+}
+@keyframes zoomFire {
+  0% {
+    background-size: 100%;
+  }
+  50% {
+    background-size: 130%;
+  }
+  100% {
+    background-size: 100%;
+  }
+}
+.transition {
+  background: 
+    linear-gradient(rgba(0, 50, 90, 0.9), rgba(0, 20, 60, 0.6)),
+    url("asset/fire2.gif") no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+}
+
+
+.floaty {
+  display: inline-block;
+  animation: floaty 6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes floaty {
+  0%   { transform: translateY(0);   opacity: 1; }
+  50%  { transform: translateY(-30px); opacity: 0.98; }
+  100% { transform: translateY(0);   opacity: 1; }
+}
+
+.windowgif {
+   position: absolute;
+  top: 4%;
+  left: 7%;
+  width: 600px;
+     mix-blend-mode: screen;
+  opacity: 0.8;
+  filter: blur(1px) saturate(0.7);
+}
+
+.photo1{
+   position: absolute;
+  top: 4%;
+  left: 7%;
+  width: 400px;
+     mix-blend-mode: screen;
+  opacity: 0.8;
+  filter: blur(1px) saturate(0.7);
+}
+
+.photo2{
+   position: absolute;
+  top: 55%;
+  left: 65%;
+  width: 400px;
+     mix-blend-mode: screen;
+  opacity: 0.8;
+  filter: blur(1px) saturate(0.7);
+}
+
+.memory-container {
+  position: relative;
+  height: 100vh;
+}
+
+.memory-container p {
+  position: absolute;
+}
+
+.p1 {
+  top: 10%;
+  left: 10%;
+}
+
+.p2 {
+  top: 20%;
+  right: 15%;
+}
+
+.p3 {
+  bottom: 20%;
+  left: 30%;
+}
+
+.p4 {
+  bottom: 10%;
+  right: 10%;
+}
+
+.memory {
+   background: url(asset/watergif.gif)no-repeat center center;
+background-size: cover;
+  height: 100vh;
+}
+
+.deep {
+  background: url(asset/water3.gif)no-repeat center center;
+background-size: cover;
+  height: 100vh;
+}
+
+.window {
+  background: url(asset/water2.gif)no-repeat center center;
+background-size: cover;
+  height: 100vh;
+}
+
+a {
+  color: lightblue;
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+a:hover {
+  color: white;
+}
