@@ -11,7 +11,9 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  letter-spacing: 5px;
 }
+
 
 .fire {
   background: url(asset/fire.gif)no-repeat center center;
@@ -85,6 +87,20 @@ body {
   position: relative;
   height: 100vh;
 }
+.memory-container a {
+  font-family: 'Caveat', cursive;
+  font-size: 1.7rem; 
+  color: #dceeff;
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+
+.memory-container a:hover {
+  transform: translateY(-4px) scale(1.05);
+  text-shadow:
+    0 0 6px #9bdcff,
+    0 0 18px #66ccff;
+}
 
 .memory-container p {
   position: absolute;
@@ -93,21 +109,25 @@ body {
 .p1 {
   top: 10%;
   left: 10%;
+  letter-spacing: 5px;
 }
 
 .p2 {
   top: 20%;
   right: 15%;
+  letter-spacing: 5px;
 }
 
 .p3 {
   bottom: 20%;
   left: 30%;
+  letter-spacing: 5px;
 }
 
 .p4 {
   bottom: 10%;
   right: 10%;
+  letter-spacing: 5px;
 }
 
 .memory {
@@ -136,4 +156,35 @@ a {
 
 a:hover {
   color: white;
+}
+
+.light {
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 3rem;
+  color: #fff2dc;
+  text-shadow:
+    0 0 8px #ffd300,
+    0 0 16px red,
+    0 0 60px darkred;
+      animation: shake 0.12s infinite alternate;
+}
+@keyframes shake {
+  from { transform: translateX(-1px); }
+  to { transform: translateX(1px); }
+}
+
+.caveat-font {
+  font-family: 'Caveat', cursive;
+  font-size: 2rem; 
+  letter-spacing: 1px;
+}
+.caveat-font:hover {
+  animation: wave 0.6s ease-in-out;
+}
+.caveat-font:hover {
+  color: #b4eaff;
+  text-shadow:
+    0 0 5px #9bdcff,
+    0 0 15px #66ccff,
+    0 0 30px #3399ff;
 }
