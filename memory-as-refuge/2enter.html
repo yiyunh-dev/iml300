@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enter</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body class="transition">
+  <audio src="asset/rain1.mp3" autoplay loop></audio>
+
+<div class="center">
+  <p class="floaty">The air changes. Water comes in.</p>
+  <a href="3memory.html" class="caveat-font">Enter Your Memory</a>
+</div>
+ <script>
+    let yoff = 0;
+
+    function setup() {
+      let canvas = createCanvas(windowWidth, windowHeight);
+
+      canvas.position(0, 0);
+      canvas.style('position', 'fixed');
+      canvas.style('z-index', '1'); 
+      canvas.style('pointer-events', 'none'); 
+    }
+
+    function draw() {
+      clear();
+      noFill();
+      for (let i = 0; i < 18; i++) {
+
+        stroke(120, 180, 255, 40 + i * 10);
+
+        beginShape();
+        let xoff = 0;
+
+        for (let x = 0; x <= width; x += 15) {
+          let y = map(
+            noise(xoff, yoff + i * 0.3),
+            0, 1,
+            height * (0.2 + i * 0.1),
+            height * (0.4 + i * 0.1)
+          );
+
+          vertex(x, y);
+          xoff += 0.03; 
+        }
+
+        endShape();
+      }
+
+      yoff += 0.003; 
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+  
+</body>
+</html>

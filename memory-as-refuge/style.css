@@ -13,7 +13,10 @@ body {
   text-align: center;
   letter-spacing: 5px;
 }
-
+.center {
+  position: relative;
+  z-index: 2;
+}
 
 .fire {
   background: url(asset/fire.gif)no-repeat center center;
