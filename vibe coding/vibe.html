@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tidal — A Space to Release</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Crimson+Pro:ital,wght@0,200;1,200&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --deep: #0d0814;
+  --abyss: #080510;
+  --biolum: #b978ff;
+  --biolum-dim: rgba(185, 120, 255, 0.15);
+  --foam: #e8d4f8;
+  --ink: rgba(232, 212, 248, 0.55);
+  --glow: rgba(185, 120, 255, 0.4);
+}
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--abyss);
+    color: var(--foam);
+    font-family: 'Cormorant Garamond', serif;
+    cursor: none;
+  }
+
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  #cursor {
+    position: fixed;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(185, 120, 255,0.9) 0%, rgba(185, 120, 255,0) 70%);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    mix-blend-mode: screen;
+  }
+  #cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(185, 120, 255,0.3);
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+    mix-blend-mode: screen;
+  }
+
+  #breath-orb {
+    position: fixed;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%,
+      rgba(185, 120, 255,0.18) 0%,
+      rgba(30,90,120,0.08) 50%,
+      transparent 70%);
+    box-shadow:
+      0 0 60px rgba(185, 120, 255,0.08),
+      inset 0 0 40px rgba(185, 120, 255,0.05);
+    z-index: 1;
+    animation: breathe 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%,-50%) scale(1.35); opacity: 1; }
+  }
+
+  #breath-guide {
+    position: fixed;
+    left: 50%; top: calc(50% + 115px);
+    transform: translateX(-50%);
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px;
+    font-weight: 200;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(185, 120, 255,0.45);
+    z-index: 2;
+    pointer-events: none;
+    animation: breathe-text 6s ease-in-out infinite;
+  }
+  @keyframes breathe-text {
+    0%, 100% { opacity: 0.3; }
+    25% { opacity: 0.7; }
+    50% { opacity: 0.7; }
+    75% { opacity: 0.3; }
+  }
+
+  #container {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    pointer-events: none;
+  }
+
+  #title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(13px, 1.8vw, 18px);
+    font-weight: 300;
+    letter-spacing: 0.6em;
+    text-transform: uppercase;
+    color: rgba(185, 120, #4dd9c00.4);
+    margin-bottom: 8px;
+    pointer-events: none;
+  }
+
+  #subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: clamp(11px, 1.2vw, 13px);
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    color: rgba(185, 120, 255,0.35);
+    margin-bottom: 56px;
+    pointer-events: none;
+  }
+
+  #offering-wrap {
+    position: relative;
+    pointer-events: all;
+    width: min(520px, 80vw);
+  }
+
+  #offering {
+    width: 100%;
+    min-height: 90px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(185, 120, 255,0.18);
+    color: rgba(185, 120, rgba(185, 120, 255, 0.4)0.85);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 2.2vw, 22px);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    resize: none;
+    outline: none;
+    caret-color: var(--biolum);
+    padding: 16px 0 12px;
+    cursor: text;
+    transition: border-color 0.5s ease;
+  }
+  #offering::placeholder {
+    color: rgba(200,232,240,0.2);
+    font-style: italic;
+  }
+  #offering:focus {
+    border-bottom-color: rgba(185, 120, 255,0.45);
+  }
+
+  #offering-hint {
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px;
+    font-weight: 200;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(185, 120, 255,0.3);
+    text-align: right;
+    margin-top: 12px;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  #release-btn {
+    margin-top: 36px;
+    background: transparent;
+    border: 1px solid rgba(185, 120, 255,0.25);
+    color: rgba(77,217,192,0.6);
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px;
+    font-weight: 200;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    padding: 11px 32px;
+    cursor: pointer;
+    pointer-events: all;
+    transition: all 0.6s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+  }
+  #release-btn:hover {
+    border-color: rgba(77,217,192,0.55);
+    color: rgba(77,217,192,0.9);
+    box-shadow: 0 0 24px rgba(77,217,192,0.1);
+  }
+  #release-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(77,217,192,0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.6s;
+  }
+  #release-btn:hover::after { opacity: 1; }
+
+  #dissolve-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  #ritual-msg {
+    position: fixed;
+    left: 50%; bottom: 10vh;
+    transform: translateX(-50%);
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: clamp(13px, 1.6vw, 16px);
+    font-weight: 200;
+    letter-spacing: 0.15em;
+    color: rgba(77,217,192,0.6);
+    z-index: 10;
+    opacity: 0;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 1.5s ease;
+  }
+
+  #vol-wrap {
+    position: fixed;
+    bottom: 32px; right: 40px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.45;
+    transition: opacity 0.4s;
+    cursor: pointer;
+  }
+  #vol-wrap:hover { opacity: 0.85; }
+  #vol-icon {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: var(--biolum);
+    stroke-width: 1.5;
+  }
+  #vol-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 10px;
+    font-weight: 200;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--biolum);
+  }
+
+  .sigil {
+    position: fixed;
+    width: 50px; height: 50px;
+    opacity: 0.12;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .sigil-tl { top: 32px; left: 40px; }
+  .sigil-br { bottom: 32px; left: 40px; transform: rotate(180deg); }
+
+  #depth {
+    position: fixed;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    font-family: 'Crimson Pro', serif;
+    font-size: 9px;
+    font-weight: 200;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(185, 120, rgba(185, 120, 255, 0.4)0.25);
+    writing-mode: vertical-rl;
+    z-index: 2;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="dissolve-canvas"></canvas>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div id="breath-orb"></div>
+<div id="breath-guide">inhale</div>
+
+<svg class="sigil sigil-tl" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="25" cy="25" r="20" fill="none" stroke="#4dd9c0" stroke-width="0.5"/>
+  <circle cx="25" cy="25" r="12" fill="none" stroke="#4dd9c0" stroke-width="0.5"/>
+  <line x1="5" y1="25" x2="45" y2="25" stroke="#4dd9c0" stroke-width="0.5"/>
+  <line x1="25" y1="5" x2="25" y2="45" stroke="#4dd9c0" stroke-width="0.5"/>
+</svg>
+<svg class="sigil sigil-br" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="25" cy="25" r="20" fill="none" stroke="#4dd9c0" stroke-width="0.5"/>
+  <circle cx="25" cy="25" r="12" fill="none" stroke="#4dd9c0" stroke-width="0.5"/>
+  <line x1="5" y1="25" x2="45" y2="25" stroke="#4dd9c0" stroke-width="0.5"/>
+  <line x1="25" y1="5" x2="25" y2="45" stroke="#4dd9c0" stroke-width="0.5"/>
+</svg>
+
+<div id="depth">depth 8,494 m</div>
+
+<div id="container">
+  <div id="title">Tidal</div>
+  <div id="subtitle">what you release here returns to the sea</div>
+  <div id="offering-wrap">
+    <textarea id="offering" rows="4"
+      placeholder="speak what weighs on you…"></textarea>
+    <div id="offering-hint">press release to dissolve</div>
+  </div>
+  <button id="release-btn">Release</button>
+</div>
+
+<div id="ritual-msg"></div>
+
+<div id="vol-wrap">
+  <svg id="vol-icon" viewBox="0 0 24 24">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke-linecap="round"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke-linecap="round"/>
+  </svg>
+  <span id="vol-label">ocean</span>
+</div>
+
+<script>
+// ============================================================
+// OCEAN AUDIO — procedural via Web Audio API
+// ============================================================
+let audioCtx = null;
+let masterGain = null;
+let soundOn = false;
+
+function buildOcean() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  masterGain.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 3);
+  masterGain.connect(audioCtx.destination);
+
+  function makeWave(freq, gain) {
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 8, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.6;
+    }
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    src.loopEnd = 8;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = freq;
+    filter.Q.value = 0.4;
+
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.value = 0.07 + Math.random() * 0.06;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = freq * 0.3;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start();
+
+    const waveGain = audioCtx.createGain();
+    waveGain.gain.value = gain;
+
+    const swellLfo = audioCtx.createOscillator();
+    swellLfo.frequency.value = 0.04 + Math.random() * 0.03;
+    const swellGain = audioCtx.createGain();
+    swellGain.gain.value = gain * 0.5;
+    swellLfo.connect(swellGain);
+    swellGain.connect(waveGain.gain);
+    swellLfo.start();
+
+    src.connect(filter);
+    filter.connect(waveGain);
+    waveGain.connect(masterGain);
+    src.start(0, Math.random() * 8);
+  }
+
+  makeWave(80, 0.4);
+  makeWave(140, 0.3);
+  makeWave(220, 0.18);
+  makeWave(380, 0.1);
+  makeWave(55, 0.5);
+  makeWave(60, 0.25);
+
+  const shimmerBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 4, audioCtx.sampleRate);
+  const sd = shimmerBuf.getChannelData(0);
+  for (let i = 0; i < sd.length; i++) sd[i] = Math.random() * 2 - 1;
+  const shimSrc = audioCtx.createBufferSource();
+  shimSrc.buffer = shimmerBuf;
+  shimSrc.loop = true;
+  const shimFilter = audioCtx.createBiquadFilter();
+  shimFilter.type = 'highpass';
+  shimFilter.frequency.value = 3500;
+  const shimGain = audioCtx.createGain();
+  shimGain.gain.value = 0.03;
+  shimSrc.connect(shimFilter);
+  shimFilter.connect(shimGain);
+  shimGain.connect(masterGain);
+  shimSrc.start();
+}
+
+document.getElementById('vol-wrap').addEventListener('click', () => {
+  if (!audioCtx) {
+    buildOcean();
+    soundOn = true;
+    document.getElementById('vol-label').textContent = 'silence';
+  } else {
+    soundOn = !soundOn;
+    if (soundOn) {
+      masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 1.5);
+      document.getElementById('vol-label').textContent = 'silence';
+    } else {
+      masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
+      document.getElementById('vol-label').textContent = 'ocean';
+    }
+  }
+});
+
+// ============================================================
+// CURSOR
+// ============================================================
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+let rx = mx, ry = my;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+  const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  const dx = (mx - cx) / cx, dy = (my - cy) / cy;
+  document.getElementById('breath-orb').style.transform =
+    `translate(calc(-50% + ${dx * 12}px), calc(-50% + ${dy * 12}px))`;
+});
+
+function lerpCursor() {
+  rx += (mx - rx) * 0.08;
+  ry += (my - ry) * 0.08;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(lerpCursor);
+}
+lerpCursor();
+
+// ============================================================
+// BACKGROUND CANVAS
+// ============================================================
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+
+let W, H;
+function resize() {
+  W = bgCanvas.width = window.innerWidth;
+  H = bgCanvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const particles = Array.from({length: 130}, () => ({
+  x: Math.random() * window.innerWidth,
+  y: Math.random() * window.innerHeight,
+  r: Math.random() * 1.8 + 0.3,
+  vx: (Math.random() - 0.5) * 0.12,
+  vy: (Math.random() - 0.5) * 0.08 - 0.04,
+  alpha: Math.random() * 0.4 + 0.05,
+  pulse: Math.random() * Math.PI * 2,
+  pulseSpeed: Math.random() * 0.015 + 0.005,
+}));
+
+const waveLines = Array.from({length: 5}, (_, i) => ({
+  y: window.innerHeight * (0.2 + i * 0.18),
+  amp: 15 + Math.random() * 25,
+  freq: 0.003 + Math.random() * 0.002,
+  phase: Math.random() * Math.PI * 2,
+  speed: 0.003 + Math.random() * 0.002,
+  alpha: 0.04 + Math.random() * 0.04,
+}));
+
+function drawBg() {
+  bgCtx.fillStyle = `rgba(5, 8, 16, 0.92)`;
+  bgCtx.fillRect(0, 0, W, H);
+
+  const grad = bgCtx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.7);
+  grad.addColorStop(0, 'rgba(15, 35, 55, 0.3)');
+  grad.addColorStop(1, 'rgba(5, 8, 16, 0)');
+  bgCtx.fillStyle = grad;
+  bgCtx.fillRect(0, 0, W, H);
+
+  const cGrad = bgCtx.createRadialGradient(mx, my, 0, mx, my, 120);
+  cGrad.addColorStop(0, 'rgba(185, 120, 255, 0.07)');
+  cGrad.addColorStop(1, 'rgba(185, 120, 255, 0)');
+  bgCtx.fillStyle = cGrad;
+  bgCtx.fillRect(0, 0, W, H);
+
+  waveLines.forEach(wl => {
+    wl.phase += wl.speed;
+    bgCtx.beginPath();
+    for (let x = 0; x <= W; x += 4) {
+      const y = wl.y + Math.sin(x * wl.freq + wl.phase) * wl.amp
+                     + Math.sin(x * wl.freq * 1.7 + wl.phase * 0.8) * wl.amp * 0.4;
+      x === 0 ? bgCtx.moveTo(x, y) : bgCtx.lineTo(x, y);
+    }
+    bgCtx.strokeStyle = `rgba(185, 120, 255, ${wl.alpha})`;
+    bgCtx.lineWidth = 0.8;
+    bgCtx.stroke();
+  });
+
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.pulse += p.pulseSpeed;
+    if (p.x < -5) p.x = W + 5;
+    if (p.x > W + 5) p.x = -5;
+    if (p.y < -5) p.y = H + 5;
+    if (p.y > H + 5) p.y = -5;
+
+    const dx = p.x - mx, dy = p.y - my;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 80) {
+      p.x += dx / dist * 0.5;
+      p.y += dy / dist * 0.5;
+    }
+
+    const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+    bgCtx.beginPath();
+    bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    bgCtx.fillStyle = `rgba(185, 120, 255, ${a})`;
+    bgCtx.fill();
+  });
+
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+// ============================================================
+// BREATH GUIDE TEXT CYCLE
+// ============================================================
+const breathGuide = document.getElementById('breath-guide');
+const phases = ['inhale', 'hold', 'exhale', 'rest'];
+const phaseDur = [2000, 1500, 2000, 500];
+let phaseIdx = 0;
+function cycleBreath() {
+  breathGuide.textContent = phases[phaseIdx];
+  phaseIdx = (phaseIdx + 1) % phases.length;
+  setTimeout(cycleBreath, phaseDur[phaseIdx]);
+}
+cycleBreath();
+
+// ============================================================
+// DISSOLVE
+// ============================================================
+const dCanvas = document.getElementById('dissolve-canvas');
+const dCtx = dCanvas.getContext('2d');
+dCanvas.width = window.innerWidth;
+dCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  dCanvas.width = window.innerWidth;
+  dCanvas.height = window.innerHeight;
+});
+
+let drops = [];
+
+const ritualMessages = [
+  'carried away by the current',
+  'dissolved into the deep',
+  'returned to the sea',
+  'released without trace',
+  'held by the water now',
+  'the ocean receives it',
+];
+
+function dissolveText(text) {
+  if (!text.trim()) return;
+  dCanvas.style.opacity = 1;
+
+  const ta = document.getElementById('offering');
+  const rect = ta.getBoundingClientRect();
+
+  drops = [];
+  const count = Math.min(text.length * 12, 600);
+  for (let i = 0; i < count; i++) {
+    drops.push({
+      x: rect.left + Math.random() * rect.width,
+      y: rect.top + Math.random() * Math.min(rect.height, 80) + 16,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: Math.random() * 2.5 + 0.5,
+      r: Math.random() * 2.5 + 0.8,
+      alpha: Math.random() * 0.7 + 0.3,
+      life: 1.0,
+      decay: 0.005 + Math.random() * 0.008,
+    });
+  }
+
+  ta.style.transition = 'opacity 0.8s ease';
+  ta.style.opacity = 0;
+  setTimeout(() => {
+    ta.value = '';
+    ta.style.opacity = 1;
+    ta.style.transition = '';
+    document.getElementById('offering-hint').style.opacity = '0';
+  }, 900);
+
+  const msg = document.getElementById('ritual-msg');
+  msg.textContent = ritualMessages[Math.floor(Math.random() * ritualMessages.length)];
+  msg.style.opacity = 1;
+  setTimeout(() => { msg.style.opacity = 0; }, 3500);
+
+  animateDrops();
+}
+
+function animateDrops() {
+  dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+  let alive = false;
+
+  drops.forEach(d => {
+    if (d.alpha <= 0) return;
+    alive = true;
+    d.x += d.vx + Math.sin(d.y * 0.04) * 0.3;
+    d.y += d.vy;
+    d.vy += 0.035;
+    d.vx *= 0.995;
+    d.alpha -= d.decay;
+
+    dCtx.beginPath();
+    dCtx.ellipse(d.x, d.y, d.r * 0.7, d.r, 0, 0, Math.PI * 2);
+    dCtx.fillStyle = `rgba(185, 120, 255, ${Math.max(0, d.alpha)})`;
+    dCtx.fill();
+  });
+
+  if (alive) {
+    requestAnimationFrame(animateDrops);
+  } else {
+    dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+    dCanvas.style.opacity = 0;
+  }
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+document.getElementById('release-btn').addEventListener('click', () => {
+  dissolveText(document.getElementById('offering').value);
+});
+
+document.getElementById('offering').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.shiftKey) {
+    e.preventDefault();
+    dissolveText(e.target.value);
+  }
+});
+
+document.getElementById('offering').addEventListener('input', function() {
+  document.getElementById('offering-hint').style.opacity =
+    this.value.trim().length > 0 ? '0.7' : '0';
+});
+
+document.getElementById('offering-hint').style.opacity = '0';
+
+document.getElementById('offering').addEventListener('keypress', () => {
+  let br = 0;
+  function pulseBurst() {
+    br += 4;
+    const a = 0.4 * (1 - br / 60);
+    if (br < 60) {
+      bgCtx.beginPath();
+      bgCtx.arc(mx, my, br, 0, Math.PI * 2);
+      bgCtx.strokeStyle = `rgba(185, 120, 255, ${a})`;
+      bgCtx.lineWidth = 0.8;
+      bgCtx.stroke();
+      requestAnimationFrame(pulseBurst);
+    }
+  }
+  pulseBurst();
+});
+</script>
+</body>
+</html>
