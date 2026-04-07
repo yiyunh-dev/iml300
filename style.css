@@ -1,0 +1,95 @@
+body {
+  background-image: url("assets/bg.gif");
+  background-size: cover;
+  height: 100vh;
+}
+
+h1 {
+  font-family: "Didot", "Times New Roman", serif;
+  font-style: italic;
+    font-size: 44px; 
+    text-align: center;  
+  padding-left: 30px;
+  color: white;
+  text-shadow: 0.3px 2.2px #ffb0eb
+
+}
+
+p {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;   
+  color: white;
+  text-align: left;  
+  padding-left: 30px;
+}
+
+h2,
+.exercise a {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 100;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+ text-align: center; 
+}
+
+
+a {
+  color: white;
+ text-align: center; 
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  width: 200%;
+  max-width: 200px;
+  height: auto;
+}
+.header h1 {
+  font-size: 60px;
+  text-align: center;
+}
+
+.intro p {
+  font-size: 16px;
+  text-align: center;
+}
+
+
+
+.exercise iframe {
+margin-bottom: 30px;  
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.item, .exercise {
+  background: rgba(165, 167, 255, 0.55);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+img {
+  width: 100%;
+  border-radius: 10px;
+     display: block;
+  margin: 0 auto;
+}
+
+iframe {
+  width: 100%;
+  height: 250px;
+  border: none;
+  margin-top: 10px;
+}
+
+.exercise a {
+  display: block;
+  margin-bottom: 10px;
+}
