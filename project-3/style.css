@@ -1,0 +1,62 @@
+body.dark {
+  background-image: url("assets/bgstar.jpg");
+     background-size: cover;
+  height: 85vh;
+}
+
+h1 {
+ font-family: "Didot", "Times New Roman", serif;
+  font-style: italic;
+  font-size: 90px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-align: center; 
+    margin-top: 30vh;
+      color: white;
+  text-shadow:
+    0 0 5px #9bdcff,
+    0 0 15px #66ccff,
+    0 0 30px #3399ff;
+ animation: float 4s ease-in-out infinite; /* 原来8s → 改成4s 更快 */
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-15px); /* 原来-6px → 改大 */
+    opacity: 1;
+  }
+}
+
+p {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(171, 214, 255, 0.7);
+  margin-top: 10px;
+text-align: center; 
+}
+
+.button {
+  display: block;   
+  width: fit-content;    
+  margin: 10px auto;     
+
+ font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 100;
+
+  padding: 10px 20px;
+
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 20px;
+
+  color: white;
+  text-decoration: none;
+
+  background: transparent;
+  transition: all 0.3s ease;
+}
