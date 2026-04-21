@@ -1,5 +1,5 @@
 body.dark {
-  background-image: url("assets/bgstar.jpg");
+  background-image: url("assets/bg.png");
      background-size: cover;
   height: 85vh;
 }
@@ -17,7 +17,7 @@ h1 {
     0 0 5px #9bdcff,
     0 0 15px #66ccff,
     0 0 30px #3399ff;
- animation: float 4s ease-in-out infinite; /* 原来8s → 改成4s 更快 */
+ animation: float 4s ease-in-out infinite; 
 }
 
 @keyframes float {
@@ -26,37 +26,38 @@ h1 {
     opacity: 0.9;
   }
   50% {
-    transform: translateY(-15px); /* 原来-6px → 改大 */
+    transform: translateY(-15px); 
     opacity: 1;
   }
 }
 
 p {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 300;
-  color: rgba(171, 214, 255, 0.7);
+    font-family: Georgia, serif;
+  color: rgba(220, 240, 255, 0.4);
+  font-size: 18px;
+  font-weight: 100;
   margin-top: 10px;
-text-align: center; 
+ text-align: center; 
+  font-style: italic;
 }
 
 .button {
+
+  background: transparent;
+  border: 0.5px solid rgba(100, 180, 255, 0.4);
+  border-radius: 40px;
+  padding: 12px 40px;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: rgba(160, 220, 255, 0.8);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.4s;
+
   display: block;   
   width: fit-content;    
   margin: 10px auto;     
-
- font-family: 'Playfair Display', serif;
-  font-size: 14px;
   font-weight: 100;
 
-  padding: 10px 20px;
-
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 20px;
-
-  color: white;
-  text-decoration: none;
-
-  background: transparent;
-  transition: all 0.3s ease;
 }
