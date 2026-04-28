@@ -1,15 +1,20 @@
-<body class="dark">
-
-<a href="index.html" class="nav">← Back</a>
-
-<div class="star-layout">
-  <div id="starContainer"></div>
-
-  <div id="commentPanel" class="comment-panel">
-    <p id="commentText">Click a star to view a memory.</p>
-    <button id="respondButton">Hold This Light</button>
-  </div>
-</div>
-
-<script src="script.js"></script>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stars</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="stars-canvas"></canvas>
+    <a href="index.html" class="nav">✦ Back ✦</a>
+    <div id="stars-tooltip"></div>
+    <div id="witness-btn-wrap">
+      <button id="witness-btn">✦ Witness ✦</button>
+    </div>
+    <script src="stars.js"></script>
+  </body>
+</html>

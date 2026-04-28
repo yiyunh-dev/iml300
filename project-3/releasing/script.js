@@ -10,11 +10,9 @@ let appStarted = false;
 
 const bgImage = new Image();
 bgImage.onload = function () {
-  console.log('bg loaded OK');
   startApp();
 };
 bgImage.onerror = function () {
-  console.error('bg FAILED to load:', bgImage.src);
   startApp();
 };
 bgImage.src = '../assets/bg.png';
@@ -33,24 +31,43 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const SEEDS = [
-  "the weight i've been carrying",
-  "words that were never said",
-  "what could have been",
-  "the version of myself i outgrew",
-  "a love that ran its course",
-  "all the unfinished goodbyes",
-  "the fear of not being enough"
+  "i still look for you when i come home",
+  "i keep thinking i hear your footsteps",
+  "luv u, forever",
+  "i didn’t realize how much of my life was you",
+  "i hope you knew how loved you were",
+  "i’m sorry i couldn’t protect you",
+  "i don’t know what to do with your toys"
 ];
 
 function startApp() {
   if (appStarted) return;
   appStarted = true;
 
-  canvas.style.opacity = 1;
   resize();
   init();
   loadMessages();
   draw();
+
+  const witnessedMsg = localStorage.getItem('witnessedMessage');
+  if (witnessedMsg) {
+    localStorage.removeItem('witnessedMessage');
+    setTimeout(() => {
+      const target = stars.find(s => s.message === witnessedMsg);
+      if (target) {
+        target.witnessCount += 1;
+        target.glowPulse = 1;
+        addSparkle(target.x, target.y);
+        let flashes = 0;
+        const flashInterval = setInterval(function() {
+          target.glowPulse = 1;
+          addSparkle(target.x, target.y);
+          flashes++;
+          if (flashes >= 3) { clearInterval(flashInterval); }
+        }, 600);
+      }
+    }, 800);
+  }
 }
 
 function resize() {
@@ -73,11 +90,12 @@ function makeStar(isBackground = true) {
     twinklePhase: randBetween(0, Math.PI * 2),
     vx: randBetween(-0.08, 0.08),
     vy: randBetween(-0.06, -0.02),
-    hue: randBetween(195, 230),
     message: null,
     isBackground,
     born: false,
-    flashStart: null
+    flashStart: null,
+    witnessCount: 0,
+    glowPulse: 0
   };
 }
 
@@ -88,7 +106,6 @@ function makeMessageStar(msg) {
   s.message = msg;
   s.vy = randBetween(-0.15, -0.05);
   s.vx = randBetween(-0.1, 0.1);
-  s.hue = randBetween(200, 220);
   s.r = 0;
   s.born = false;
   s.flashStart = performance.now();
@@ -98,38 +115,23 @@ function makeMessageStar(msg) {
 function addSparkle(x, y) {
   for (let i = 0; i < 10; i++) {
     sparkles.push({
-      x,
-      y,
+      x, y,
       vx: randBetween(-1.8, 1.8),
       vy: randBetween(-2.4, -0.6),
-      life: 1,
-      hue: randBetween(195, 225)
+      life: 1
     });
   }
 }
 
-function drawGlow(x, y, r, alpha) {
-  const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3.8);
-  g.addColorStop(0, `rgba(120, 200, 255, ${alpha})`);
-  g.addColorStop(0.35, `rgba(90, 170, 255, ${alpha * 0.45})`);
-  g.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(x, y, r * 3.8, 0, Math.PI * 2);
-  ctx.fill();
-}
-
 function init() {
   stars = [];
-
-  for (let i = 0; i < 260; i++) {
+  for (let i = 0; i < 200; i++) {
     stars.push(makeStar(true));
   }
-
   SEEDS.forEach(m => {
     const s = makeMessageStar(m);
     s.r = s.targetR;
-    s.opacity = randBetween(0.55, 0.95);
+    s.opacity = 0.8;
     s.born = true;
     stars.push(s);
   });
@@ -138,7 +140,7 @@ function init() {
 function loadMessages() {
   db.collection("releases")
     .orderBy("timestamp", "desc")
-    .limit(60)
+    .limit(50)
     .onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === "added") {
@@ -146,10 +148,8 @@ function loadMessages() {
           if (data.message) {
             const s = makeMessageStar(data.message);
             s.r = s.targetR;
-            s.opacity = randBetween(0.65, 1);
+            s.opacity = 0.9;
             s.born = true;
-            s.x = randBetween(W * 0.05, W * 0.95);
-            s.y = randBetween(H * 0.05, H * 0.85);
             stars.push(s);
           }
         }
@@ -157,228 +157,116 @@ function loadMessages() {
     });
 }
 
+function showTooltip(star) {
+  tooltip.textContent = star.message;
+  tooltip.style.opacity = '1';
+  tooltip.style.left = (mouse.x + 20) + 'px';
+  tooltip.style.top = (mouse.y - 40) + 'px';
+}
+
+function hideTooltip() {
+  tooltip.style.opacity = '0';
+}
+
 function draw() {
   ctx.clearRect(0, 0, W, H);
 
-  if (bgImage.complete && bgImage.naturalWidth > 0) {
+  if (bgImage.complete) {
     ctx.drawImage(bgImage, 0, 0, W, H);
   }
 
-  ctx.fillStyle = 'rgba(0, 0, 5, 0.2)';
-  ctx.fillRect(0, 0, W, H);
-
-  const nebula = ctx.createRadialGradient(W * 0.75, H * 0.7, 0, W * 0.75, H * 0.7, W * 0.45);
-  nebula.addColorStop(0, 'rgba(10,30,80,0.15)');
-  nebula.addColorStop(0.5, 'rgba(5,15,50,0.07)');
-  nebula.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = nebula;
-  ctx.fillRect(0, 0, W, H);
-
-  const nebula2 = ctx.createRadialGradient(W * 0.15, H * 0.15, 0, W * 0.15, H * 0.15, W * 0.3);
-  nebula2.addColorStop(0, 'rgba(10,20,60,0.1)');
-  nebula2.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = nebula2;
-  ctx.fillRect(0, 0, W, H);
-
   let hoveredStar = null;
-  let minDist = 38;
-  const now = performance.now();
+  let minDist = 50;
 
-  for (let i = stars.length - 1; i >= 0; i--) {
-    const s = stars[i];
-
-    if (!s.born) {
-      s.r += 0.12;
-      if (s.r >= s.targetR) {
-        s.r = s.targetR;
-        s.born = true;
-      }
-      s.opacity = Math.min(1, s.opacity + 0.05);
-    }
-
-    s.twinklePhase += s.twinkleSpeed;
-    const twinkle = 0.7 + 0.3 * Math.sin(s.twinklePhase);
-
+  stars.forEach(s => {
     s.x += s.vx;
     s.y += s.vy;
 
-    if (s.x < -20) s.x = W + 20;
-    if (s.x > W + 20) s.x = -20;
-    if (s.y < -20) {
-      s.y = H + 20;
-      s.x = randBetween(0, W);
-    }
+    if (s.x < 0) s.x = W;
+    if (s.x > W) s.x = 0;
+    if (s.y < 0) s.y = H;
+    if (s.y > H) s.y = 0;
+
+    if (s.glowPulse > 0) { s.glowPulse = Math.max(0, s.glowPulse - 0.008); }
 
     const dist = Math.hypot(s.x - mouse.x, s.y - mouse.y);
-    const isHovered = !s.isBackground && dist < minDist;
-    if (isHovered) {
+    if (!s.isBackground && dist < minDist) {
       hoveredStar = s;
       minDist = dist;
     }
 
-    let flash = 1;
-    if (!s.isBackground && s.flashStart) {
-      const t = (now - s.flashStart) / 1000;
-      if (t < 4) {
-        flash = 1 + 1.15 * Math.sin(t * 14) * (1 - t / 4);
-      }
-    }
-
-    if (!s.isBackground) {
-      const glowStrength = (isHovered ? 1 : 0.75) * flash;
-      drawGlow(s.x, s.y, s.r, s.opacity * 0.95 * twinkle * glowStrength);
-    }
-
+    const glowBoost = 1 + (s.witnessCount || 0) * 0.3 + (s.glowPulse || 0) * 0.5;
+    const glowR = s.r * 4.5 * glowBoost;
+    const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+    g.addColorStop(0, `rgba(120, 200, 255, ${0.35 + (s.glowPulse || 0) * 0.2})`);
+    g.addColorStop(0.4, `rgba(90, 160, 255, ${0.12 + (s.glowPulse || 0) * 0.1})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.shadowBlur = 0;
+    ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
+    ctx.fill();
 
-    if (s.isBackground) {
-      ctx.fillStyle = `rgba(255,255,255,${s.opacity * twinkle})`;
-    } else if (isHovered) {
-      ctx.shadowColor = 'rgba(120, 200, 255, 0.95)';
-      ctx.shadowBlur = 18;
-      ctx.fillStyle = `rgba(120, 200, 255, ${Math.min(1, s.opacity * twinkle * flash)})`;
-    } else {
-      ctx.shadowColor = 'rgba(120, 200, 255, 0.8)';
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = `rgba(120, 200, 255, ${Math.min(1, s.opacity * twinkle * flash)})`;
-    }
-
+    const coreR = s.r * (1 + (s.witnessCount || 0) * 0.1);
+    const core = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, coreR);
+    core.addColorStop(0, `rgba(200, 235, 255, ${0.9 + (s.glowPulse || 0) * 0.1})`);
+    core.addColorStop(0.5, `rgba(120, 200, 255, 0.6)`);
+    core.addColorStop(1, `rgba(80, 160, 255, 0)`);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, coreR, 0, Math.PI * 2);
+    ctx.fillStyle = core;
     ctx.fill();
     ctx.shadowBlur = 0;
-  }
-
-  sparkles = sparkles.filter(p => p.life > 0);
-  sparkles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.05;
-    p.life -= 0.04;
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 1.8 * p.life, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(130, 210, 255, ${p.life})`;
-    ctx.fill();
   });
 
-  if (hoveredStar && hoveredStar.message) {
-    if (tooltipStar !== hoveredStar) {
-      tooltipStar = hoveredStar;
-      tooltip.textContent = hoveredStar.message;
-      tooltip.style.opacity = '1';
-    }
-    const tx = Math.min(mouse.x + 20, W - 240);
-    const ty = Math.max(mouse.y - 50, 8);
-    tooltip.style.left = tx + 'px';
-    tooltip.style.top = ty + 'px';
-  } else if (tooltipStar) {
-    tooltipStar = null;
-    tooltip.style.opacity = '0';
+  if (hoveredStar) {
+    showTooltip(hoveredStar);
+  } else {
+    hideTooltip();
   }
 
   requestAnimationFrame(draw);
 }
 
-async function release() {
-  const val = input.value.trim();
-  if (!val) return;
+canvas.addEventListener('click', function(e) {
+  const clickX = e.clientX;
+  const clickY = e.clientY;
 
-  input.value = '';
-  input.blur();
+  let clickedStar = null;
+  let minDist = 50;
 
-  try {
-    await db.collection("releases").add({
-      message: val,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (e) {
-    console.error("Firebase write failed:", e);
-  }
-
-  btn.disabled = true;
-  btn.textContent = '✦ releasing ✦';
-  btn.style.color = 'rgba(180,230,255,0.6)';
-
-  const floatingText = document.createElement('div');
-  floatingText.textContent = val;
-  floatingText.style.cssText = `
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-family: Georgia, serif;
-    font-size: 16px;
-    color: rgba(200, 235, 255, 0.95);
-    pointer-events: none;
-    z-index: 100;
-    text-align: center;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  `;
-  document.body.appendChild(floatingText);
-
-  let startTime = null;
-  const duration = 2200;
-  const startX = window.innerWidth / 2;
-  const startY = window.innerHeight / 2;
-  const endX = startX + (Math.random() - 0.5) * 300;
-  const endY = startY - 200 - Math.random() * 150;
-
-  function animateToStar(timestamp) {
-    if (!startTime) startTime = timestamp;
-    const progress = Math.min((timestamp - startTime) / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-
-    const x = startX + (endX - startX) * ease;
-    const y = startY + (endY - startY) * ease;
-    const scale = 1 - ease * 0.85;
-    const opacity = progress < 0.7 ? 1 : 1 - ((progress - 0.7) / 0.3);
-
-    floatingText.style.left = x + 'px';
-    floatingText.style.top = y + 'px';
-    floatingText.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    floatingText.style.opacity = opacity;
-    floatingText.style.filter = `blur(${ease * 3}px)`;
-
-    if (progress < 1) {
-      requestAnimationFrame(animateToStar);
-    } else {
-      document.body.removeChild(floatingText);
-
-      const s = makeMessageStar(val);
-      s.x = endX;
-      s.y = endY;
-      s.r = s.targetR;
-      s.opacity = 1;
-      s.born = true;
-      s.flashStart = performance.now();
-      addSparkle(s.x, s.y);
-      stars.push(s);
-
-      btn.disabled = false;
-      btn.textContent = '✦ Release ✦';
-      btn.style.color = '';
+  for (let i = 0; i < stars.length; i++) {
+    const s = stars[i];
+    if (!s.message) continue;
+    const dist = Math.hypot(s.x - clickX, s.y - clickY);
+    if (dist < minDist) {
+      clickedStar = s;
+      minDist = dist;
     }
   }
 
-  requestAnimationFrame(animateToStar);
-}
+  
+  if (clickedStar) {
+    localStorage.setItem('witnessMessage', clickedStar.message);
 
-btn.addEventListener('click', release);
-input.addEventListener('keydown', e => {
-  if (e.key === 'Enter') release();
-});
+    clickedStar.flashTimer = 1.2;
+    clickedStar.glowPulse = 1.5;
 
-canvas.addEventListener('mousemove', e => {
+    addSparkle(clickedStar.x, clickedStar.y);
+
+    const overlay = document.getElementById('transition');
+    if (overlay) {
+      overlay.style.opacity = 1;
+    }
+
+    setTimeout(() => {
+      window.location.href = 'star.html';
+    }, 500);
+  }
+
+}); 
+document.addEventListener('mousemove', e => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
-
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  mouse.x = e.touches[0].clientX;
-  mouse.y = e.touches[0].clientY;
-}, { passive: false });
 
 window.addEventListener('resize', resize);
