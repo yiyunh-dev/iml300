@@ -9,22 +9,14 @@ let tooltipStar = null, sparkles = [];
 let appStarted = false;
 
 const bgImage = new Image();
-bgImage.onload = function () {
-  startApp();
-};
-bgImage.onerror = function () {
-  startApp();
-};
+bgImage.onload = function () { startApp(); };
+bgImage.onerror = function () { startApp(); };
 bgImage.src = '../assets/bg.png';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAFZvcDv7a6P07IVblTYURNPWazuwUdwDk",
-  authDomain: "iml-demo.firebaseapp.com",
-  databaseURL: "https://iml-demo-default-rtdb.firebaseio.com",
-  projectId: "iml-demo",
-  storageBucket: "iml-demo.firebasestorage.app",
-  messagingSenderId: "218648189128",
-  appId: "1:218648189128:web:730c2bb54753b9a343edfd"
+  apiKey: "AIzaSy...",
+  authDomain: "...",
+  projectId: "...",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -52,21 +44,16 @@ function startApp() {
   const witnessedMsg = localStorage.getItem('witnessedMessage');
   if (witnessedMsg) {
     localStorage.removeItem('witnessedMessage');
+
     setTimeout(() => {
       const target = stars.find(s => s.message === witnessedMsg);
       if (target) {
         target.witnessCount += 1;
-        target.glowPulse = 1;
+        target.glowPulse = 1.5;
+        target.flashTimer = 1.2;
         addSparkle(target.x, target.y);
-        let flashes = 0;
-        const flashInterval = setInterval(function() {
-          target.glowPulse = 1;
-          addSparkle(target.x, target.y);
-          flashes++;
-          if (flashes >= 3) { clearInterval(flashInterval); }
-        }, 600);
       }
-    }, 800);
+    }, 600);
   }
 }
 
@@ -86,16 +73,14 @@ function makeStar(isBackground = true) {
     r: isBackground ? randBetween(0.3, 1.4) : 0,
     targetR: isBackground ? randBetween(0.3, 1.4) : randBetween(6, 10),
     opacity: isBackground ? randBetween(0.2, 0.9) : 0,
-    twinkleSpeed: randBetween(0.003, 0.012),
-    twinklePhase: randBetween(0, Math.PI * 2),
     vx: randBetween(-0.08, 0.08),
     vy: randBetween(-0.06, -0.02),
     message: null,
     isBackground,
     born: false,
-    flashStart: null,
     witnessCount: 0,
-    glowPulse: 0
+    glowPulse: 0,
+    flashTimer: 0
   };
 }
 
@@ -104,11 +89,9 @@ function makeMessageStar(msg) {
   s.x = randBetween(W * 0.1, W * 0.9);
   s.y = randBetween(H * 0.2, H * 0.7);
   s.message = msg;
-  s.vy = randBetween(-0.15, -0.05);
-  s.vx = randBetween(-0.1, 0.1);
-  s.r = 0;
-  s.born = false;
-  s.flashStart = performance.now();
+  s.r = s.targetR;
+  s.opacity = 1;
+  s.born = true;
   return s;
 }
 
@@ -125,15 +108,13 @@ function addSparkle(x, y) {
 
 function init() {
   stars = [];
+
   for (let i = 0; i < 200; i++) {
     stars.push(makeStar(true));
   }
+
   SEEDS.forEach(m => {
-    const s = makeMessageStar(m);
-    s.r = s.targetR;
-    s.opacity = 0.8;
-    s.born = true;
-    stars.push(s);
+    stars.push(makeMessageStar(m));
   });
 }
 
@@ -146,11 +127,7 @@ function loadMessages() {
         if (change.type === "added") {
           const data = change.doc.data();
           if (data.message) {
-            const s = makeMessageStar(data.message);
-            s.r = s.targetR;
-            s.opacity = 0.9;
-            s.born = true;
-            stars.push(s);
+            stars.push(makeMessageStar(data.message));
           }
         }
       });
@@ -187,7 +164,13 @@ function draw() {
     if (s.y < 0) s.y = H;
     if (s.y > H) s.y = 0;
 
-    if (s.glowPulse > 0) { s.glowPulse = Math.max(0, s.glowPulse - 0.008); }
+    if (s.glowPulse > 0) s.glowPulse -= 0.01;
+
+    let flash = 0;
+    if (s.flashTimer > 0) {
+      flash = Math.sin(s.flashTimer * 25) * 0.5 + 0.5;
+      s.flashTimer -= 0.04;
+    }
 
     const dist = Math.hypot(s.x - mouse.x, s.y - mouse.y);
     if (!s.isBackground && dist < minDist) {
@@ -195,75 +178,81 @@ function draw() {
       minDist = dist;
     }
 
-    const glowBoost = 1 + (s.witnessCount || 0) * 0.3 + (s.glowPulse || 0) * 0.5;
-    const glowR = s.r * 4.5 * glowBoost;
+    const glowR = s.r * (4 + flash * 2);
     const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
-    g.addColorStop(0, `rgba(120, 200, 255, ${0.35 + (s.glowPulse || 0) * 0.2})`);
-    g.addColorStop(0.4, `rgba(90, 160, 255, ${0.12 + (s.glowPulse || 0) * 0.1})`);
+    g.addColorStop(0, `rgba(120,200,255,${0.4 + flash})`);
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
     ctx.fill();
 
-    const coreR = s.r * (1 + (s.witnessCount || 0) * 0.1);
-    const core = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, coreR);
-    core.addColorStop(0, `rgba(200, 235, 255, ${0.9 + (s.glowPulse || 0) * 0.1})`);
-    core.addColorStop(0.5, `rgba(120, 200, 255, 0.6)`);
-    core.addColorStop(1, `rgba(80, 160, 255, 0)`);
     ctx.beginPath();
-    ctx.arc(s.x, s.y, coreR, 0, Math.PI * 2);
-    ctx.fillStyle = core;
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(120,200,255,0.9)";
     ctx.fill();
-    ctx.shadowBlur = 0;
   });
 
-  if (hoveredStar) {
-    showTooltip(hoveredStar);
-  } else {
-    hideTooltip();
-  }
+  if (hoveredStar) showTooltip(hoveredStar);
+  else hideTooltip();
 
   requestAnimationFrame(draw);
 }
 
-canvas.addEventListener('click', function(e) {
-  const clickX = e.clientX;
-  const clickY = e.clientY;
+//////////////////////////////////////////////////////////
+// ⭐ 输入生成星星（修复重点）
+//////////////////////////////////////////////////////////
 
+function release() {
+  const val = input.value.trim();
+  if (!val) return;
+
+  input.value = '';
+
+  const s = makeMessageStar(val);
+
+  // ⭐ 强出现效果
+  s.flashTimer = 1;
+  s.glowPulse = 1;
+
+  stars.push(s);
+  addSparkle(s.x, s.y);
+
+  db.collection("releases").add({
+    message: val,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+btn.addEventListener('click', release);
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') release();
+});
+
+//////////////////////////////////////////////////////////
+
+canvas.addEventListener('click', function(e) {
   let clickedStar = null;
   let minDist = 50;
 
-  for (let i = 0; i < stars.length; i++) {
-    const s = stars[i];
-    if (!s.message) continue;
-    const dist = Math.hypot(s.x - clickX, s.y - clickY);
-    if (dist < minDist) {
+  stars.forEach(s => {
+    if (!s.message) return;
+    const d = Math.hypot(s.x - e.clientX, s.y - e.clientY);
+    if (d < minDist) {
       clickedStar = s;
-      minDist = dist;
+      minDist = d;
     }
-  }
+  });
 
-  
   if (clickedStar) {
     localStorage.setItem('witnessMessage', clickedStar.message);
-
-    clickedStar.flashTimer = 1.2;
-    clickedStar.glowPulse = 1.5;
-
-    addSparkle(clickedStar.x, clickedStar.y);
-
-    const overlay = document.getElementById('transition');
-    if (overlay) {
-      overlay.style.opacity = 1;
-    }
-
     setTimeout(() => {
       window.location.href = 'star.html';
-    }, 500);
+    }, 300);
   }
+});
 
-}); 
 document.addEventListener('mousemove', e => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;

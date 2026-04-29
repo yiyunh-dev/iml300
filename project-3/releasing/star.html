@@ -99,16 +99,16 @@
       }
 
       witnessAction.addEventListener('click', function() {
-        // 存储已被见证，回去后让对应星星变亮
+   
         localStorage.setItem('witnessedMessage', msg);
 
-        // 文字淡出
+       
         witnessMessage.style.opacity = '0';
         witnessHint.style.opacity = '0';
         witnessAction.style.opacity = '0';
         witnessAction.style.pointerEvents = 'none';
 
-        // 1.5秒后返回
+      
         setTimeout(function() {
           window.location.href = 'index.html';
         }, 1800);
