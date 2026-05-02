@@ -18,8 +18,7 @@ h1 {
 p {
    font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 200;   
-  color: white;
-  text-align: left;  
+  color: white; 
   padding-left: 30px;
 }
 
@@ -93,3 +92,15 @@ iframe {
   display: block;
   margin-bottom: 10px;
 }
+
+.vibe-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; 
+   justify-content: center;
+}
+
+.vibe-container .item {
+  width: calc(50% - 10px); 
+}
+  
